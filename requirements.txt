@@ -46,7 +46,7 @@ pillow==10.3.0
 prompt-toolkit==3.0.39
 psycopg2-binary==2.9.3
 pyee==11.1.0
-PyMySQL==1.1.0
+PyMySQL==1.1.1
 pyppeteer==2.0.0
 pyquery==2.0.0
 python-crontab==3.0.0
