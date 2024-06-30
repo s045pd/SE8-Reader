@@ -1,0 +1,69 @@
+version: "3.9"
+services:
+  db:
+    image: "bitnami/postgresql:12"
+    restart: always
+    environment:
+
+      POSTGRESQL_DATABASE: ${DB_DATABASE}
+      POSTGRESQL_USERNAME: ${DB_USER}
+      POSTGRESQL_PASSWORD: ${DB_PASSWORD}
+      POSTGRESQL_PORT_NUMBER: ${DB_PORT_NUMBER}
+    volumes:
+      - ./vol/db/:/bitnami/postgresql
+      - ./config/db_init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - ${DB_PORT_NUMBER}:${DB_PORT_NUMBER}
+    expose:
+      - ${DB_PORT_NUMBER}
+    networks:
+      se8-net:
+        ipv4_address: 172.31.0.3
+
+  redis:
+    image: "bitnami/redis:latest"
+    volumes:
+      - ./vol/redis/:/data
+    environment:
+      REDIS_PORT_NUMBER: ${REDIS_PORT_NUMBER}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      se8-net:
+        ipv4_address: 172.31.0.4
+
+  server:
+    image: "se8"
+    build: ./
+    volumes:
+      - ./vol/logs/:/var/log/server
+    depends_on:
+      - db
+      - redis
+    environment:
+      DB_HOST: db
+      DB_PORT_NUMBER: ${DB_PORT_NUMBER}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT_NUMBER: ${REDIS_PORT_NUMBER}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
+      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
+    links:
+      - db
+      - redis
+    ports:
+      - "8000:8000"
+    expose:
+      - "8000"
+    networks:
+      se8-net:
+        ipv4_address: 172.31.0.2
+
+networks:
+  se8-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.31.0.0/16

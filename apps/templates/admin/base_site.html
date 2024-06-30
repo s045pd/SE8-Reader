@@ -1,0 +1,49 @@
+{% extends "admin/base.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    .custom-button {
+        position: absolute;
+        top: 10px;
+        padding: 2px 4px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .custom-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("find-books-button").addEventListener("click", function () {
+            fetch("{% url 'trigger_find_books' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({})
+            }).then(response => {
+                if (response.ok) {
+                    alert("Find Books task triggered successfully!");
+                } else {
+                    alert("Failed to trigger Find Books task.");
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+{% block branding %}
+{{ block.super }}
+{% if user.is_authenticated and user.is_staff %}
+<button id="find-books-button" class="custom-button">Start Find Books</button>
+{% endif %}
+{% endblock %}

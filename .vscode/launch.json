@@ -1,0 +1,79 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Web",
+            "type": "debugpy",
+            "request": "launch",
+            "args": [
+                "runserver",
+                "127.0.0.1:8002"
+            ],
+            "django": true,
+            "autoStartBrowser": false,
+            "program": "${workspaceFolder}/manage.py"
+        },
+        {
+            "name": "Shell",
+            "type": "debugpy",
+            "request": "launch",
+            "args": [
+                "shell"
+            ],
+            "django": true,
+            "autoStartBrowser": false,
+            "program": "${workspaceFolder}/manage.py"
+        },
+        {
+            "name": "CeleryBeats",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "celery",
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env",
+            "args": [
+                "-A",
+                "SE8",
+                "beat",
+                "-l",
+                "INFO",
+                "--scheduler",
+                "django_celery_beat.schedulers:DatabaseScheduler"
+            ],
+        },
+        {
+            "name": "CeleryWorker",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "celery",
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env",
+            "args": [
+                "-A",
+                "SE8",
+                "worker",
+                "-l",
+                "INFO",
+                "-E"
+            ],
+            "justMyCode": false,
+        },
+        {
+            "name": "Gunicorn",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/gunicorn",
+            "envFile": "${workspaceFolder}/.env",
+            "args": [
+                "SE8.wsgi",
+                "--bind=127.0.0.1:8004",
+                "--capture-output",
+                "--reload"
+            ],
+            "django": true,
+        },
+    ]
+}
