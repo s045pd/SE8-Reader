@@ -47,7 +47,7 @@ This project is automated, minimizing manual input. Here are the main actions:
 
 1. Start Finding Books
 
-	- Use the "Start Find Books" button at the top to initiate the book-finding process.
+	- Use the <span style="color:red"><strong>"Start Find Books"</strong> </span> button at the top to initiate the book-finding process.
 
 2. Books Management
 
