@@ -5,6 +5,27 @@
 
 This project is an adult comic downloader that promises to provide access to a wide range of mature content. Dive in and explore responsibly!
 
+## 🐳 Quick Use
+
+
+To run the project using Docker Compose, follow these steps:
+
+1. Build and Start Services:
+
+	Use the provided docker_compose_rebuild.sh script to build and start the Docker Compose services:
+
+```bash
+bash docker_compose_rebuild.sh
+```
+
+This script will stop any running services, build the Docker images, and start the services as defined in your docker-compose.yml file.
+
+
+2.	Configuration:
+	
+	Ensure you have configured your .env file properly. Note that using SQLite (USE_SQLITE) may have performance issues.
+
+
 ## 🛠️ Installation
 
 First, ensure you have Python installed on your system. Then, clone the repository and navigate to the project directory:
@@ -37,6 +58,21 @@ python manage.py runserver
 ```
 
 Access the project in your browser at http://127.0.0.1:8000/.
+
+## 🌀 Starting Celery
+
+To ensure background tasks run smoothly, you need to start Celery. Use the following command to start the Celery worker:
+
+```bash
+celery -A SE8 worker --loglevel=info
+```
+
+Additionally, start the Celery beat scheduler to handle periodic tasks:
+
+```bash
+celery -A SE8 beat --loglevel=info
+```
+
 
 ## 🖥️ Usage
 
@@ -76,19 +112,6 @@ Based on the admin.py file, here are the actions you can perform:
 
 - refresh_images: Refreshes the images for the selected books.
 
-## 🌀 Starting Celery
-
-To ensure background tasks run smoothly, you need to start Celery. Use the following command to start the Celery worker:
-
-```bash
-celery -A SE8 worker --loglevel=info
-```
-
-Additionally, start the Celery beat scheduler to handle periodic tasks:
-
-```bash
-celery -A SE8 beat --loglevel=info
-```
 
 ## 🐳 Using Docker
 To run the project using Docker, follow these steps:
@@ -107,25 +130,6 @@ This script will stop any running containers, build a new Docker image, and star
 
 Ensure you have configured your .env file properly. Note that using SQLite (`USE_SQLITE`) may have performance issues.
 
-## 🐳 Using Docker-Compose
-
-
-To run the project using Docker Compose, follow these steps:
-
-1. Build and Start Services:
-
-	Use the provided docker_compose_rebuild.sh script to build and start the Docker Compose services:
-
-```bash
-bash docker_compose_rebuild.sh
-```
-
-This script will stop any running services, build the Docker images, and start the services as defined in your docker-compose.yml file.
-
-
-2.	Configuration:
-	
-	Ensure you have configured your .env file properly. Note that using SQLite (USE_SQLITE) may have performance issues.
 
 
 
