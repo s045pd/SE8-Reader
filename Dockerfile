@@ -8,7 +8,7 @@ RUN apt update \
     && if [ ! -d /var/log/nginx ]; then mkdir /var/log/nginx; fi  
 
 ADD requirements.txt .
-RUN pip3 install -i  --no-cache-dir -r requirements.txt 
+RUN pip3 install  --no-cache-dir -r requirements.txt 
 
 ADD . .
 
