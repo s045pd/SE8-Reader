@@ -1,12 +1,9 @@
-# 🎨 Unorthodox Comic Project
-> By GPT-4o+Claude
+# 🎨 SE8-Reader
+> By GPT-4o + Claude + ME🧑‍💻
 
-Welcome to the wacky world of our Unorthodox Comic Project! This guide will help you navigate through the whimsical chaos.
+📖 Overview
 
-## 📖 Overview
-
-This project is a playful, irreverent comic generator that promises to bring a smile (or a groan) to your face. Dive in and explore the hilarity!
-
+This project is an adult comic downloader that promises to provide access to a wide range of mature content. Dive in and explore responsibly!
 
 ## 🛠️ Installation
 
