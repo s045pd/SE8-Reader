@@ -7,24 +7,20 @@ This project is an adult comic downloader that promises to provide access to a w
 
 ## 🐳 Quick Use
 
-
-To run the project using Docker Compose, follow these steps:
-
-1. Build and Start Services:
-
-	Use the provided docker_compose_rebuild.sh script to build and start the Docker Compose services:
+Ensure that you have Docker and Docker Compose installed and Docker is running.
 
 ```bash
+git clone <repository-url>
+cd <project-directory>
 bash docker_compose_rebuild.sh
 ```
+After a short wait, open your browser and visit ***http://127.0.0.1:8000***. 
 
-This script will stop any running services, build the Docker images, and start the services as defined in your docker-compose.yml file.
+Log in with the default credentials ***admin:admin***. 
 
+Then, click on the ***“Start Find Books”*** button in the top left corner to begin scraping.
 
-2.	Configuration:
-	
-	Ensure you have configured your .env file properly. Note that using SQLite (USE_SQLITE) may have performance issues.
-
+OR ~
 
 ## 🛠️ Installation
 
