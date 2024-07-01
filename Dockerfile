@@ -1,19 +1,14 @@
 FROM python:3.10.5-slim-buster
 WORKDIR /opt/server
 
-RUN echo 'deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye main contrib non-free\
-    deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-updates main contrib non-free\
-    deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-backports main contrib non-free\
-    deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main contrib non-free' > /etc/apt/sources.list \
-    && apt update \
+RUN apt update \
     && apt-get install --no-install-recommends -y libmagic-dev nginx procps gcc nodejs npm pkg-config \
     && npm config set registry https://registry.npmmirror.com \
     && npm install pm2 -g \
     && if [ ! -d /var/log/nginx ]; then mkdir /var/log/nginx; fi  
 
-ARG a=1
 ADD requirements.txt .
-RUN pip3 install -i  https://pypi.tuna.tsinghua.edu.cn/simple  --no-cache-dir -r requirements.txt 
+RUN pip3 install -i  --no-cache-dir -r requirements.txt 
 
 ADD . .
 

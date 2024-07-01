@@ -3,3 +3,4 @@ vol
 *.pyc
 *.pyo
 *.DS_Store
+Dockerfile_*
