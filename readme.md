@@ -5,6 +5,8 @@
 
 This project is an adult comic downloader that promises to provide access to a wide range of mature content. Dive in and explore responsibly!
 
+> **✨Note**: There are daily release updates for new comics through the Github Actions workflow. And the zip file password is the release date in the format `YYYY-MM-DD`.
+
 ## 🐳 Quick Use
 
 Ensure that you have Docker and Docker Compose installed and Docker is running.

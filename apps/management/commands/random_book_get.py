@@ -44,7 +44,7 @@ class Command(BaseCommand):
 
         print(f"Got {len(books)} books")
 
-        (book_dir / "name").write_text((book := choice(books))["title"])
+        (book_dir / "name").write_text((book := choice(books))["id"])
 
         print(f"Getting book: {book['title']}")
 

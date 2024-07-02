@@ -44,7 +44,7 @@ class ImageExtractor:
 
     async def get_books(self) -> AsyncGenerator[str, None]:
         """Fetch books from the website"""
-        for page in range(1, 50):
+        for page in range(1, 2000):
             print(f"Fetching page {page}")
             resp = await self._send_request(
                 f"{self.origin}/index.php/category/page/{page}"
