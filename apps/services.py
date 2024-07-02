@@ -2,7 +2,7 @@ import asyncio
 from typing import AsyncGenerator, List
 
 from fake_useragent import UserAgent
-from requests_html import HTML, HTMLSession
+from requests_html import HTML, AsyncHTMLSession
 
 from apps.tools import curl
 
@@ -21,7 +21,7 @@ class ImageExtractor:
         if not hasattr(self, "_initialized"):
             self._initialized = True
             self.origin = "https://se8.us"
-            self.cli = HTMLSession()
+            self.cli = AsyncHTMLSession()
             self.cli.headers.update(
                 {
                     "User-Agent": UserAgent(os=["windows"], platforms="pc").chrome,
@@ -40,13 +40,7 @@ class ImageExtractor:
             resp = await asyncio.to_thread(curl, url)
             return HTML(html=resp)
 
-        return await asyncio.to_thread(
-            self.cli.get,
-            {
-                "url": url,
-                "headers": {"referer": "https://se8.us/"},
-            },
-        )
+        return await self.cli.get(url=url, headers={"referer": "https://se8.us/"})
 
     async def get_books(self) -> AsyncGenerator[str, None]:
         """Fetch books from the website"""
