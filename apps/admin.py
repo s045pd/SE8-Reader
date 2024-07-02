@@ -2,13 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from apps.models import Book, Episode, Image, Tag
-from apps.tasks import (
-    convert_to_pdf,
-    download_image,
-    download_images,
-    find_episodes,
-    find_images,
-)
+from apps.tasks import convert_to_pdf, download_images, find_episodes, find_images
 
 
 @admin.register(Tag)
@@ -132,9 +126,8 @@ class EpisodeAdmin(admin.ModelAdmin):
 
     def get_images(self, request, queryset):
         """Download images for selected episodes"""
-        download_images.apply_async(
-            args=[list(queryset.only("id").values_list("id", flat=True))]
-        )
+        for episode_id in queryset.only("id").values_list("id", flat=True).iterator():
+            find_images.apply_async(args=[episode_id, True])
 
     get_images.short_description = "Download Images (Force)"
 

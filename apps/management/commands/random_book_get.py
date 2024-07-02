@@ -36,9 +36,16 @@ class Command(BaseCommand):
         book_dir = Path("books")
         book_dir.mkdir(exist_ok=True)
         worker = ImageExtractor()
+        await worker.get_max_page()
+
+        random_page = choice(range(1, worker.max_page + 1))
 
         print("Start fetching books")
-        if not (books := await self.collect_async_generator(worker.get_books())):
+        if not (
+            books := await self.collect_async_generator(
+                worker.get_books(target_page=random_page)
+            )
+        ):
             print("No books found")
             return
 

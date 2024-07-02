@@ -31,6 +31,7 @@ class ImageExtractor:
                     "Priority": "u=0, i",
                 }
             )
+            self.max_page = 2000
 
     async def _send_request(self, url: str, use_curl: bool = True) -> object:
         """Send a GET request to the given URL"""
@@ -42,9 +43,25 @@ class ImageExtractor:
 
         return await self.cli.get(url=url, headers={"referer": "https://se8.us/"})
 
-    async def get_books(self) -> AsyncGenerator[str, None]:
+    async def get_max_page(self) -> int:
+        """Fetch the maximum page number"""
+        try:
+            resp = await self._send_request(f"{self.origin}/index.php/category/page/1")
+            self.max_page = int(resp.xpath('//a[@class="end"]/@href')[0].split("/")[-1])
+            print(f"Max page: {self.max_page}")
+        except Exception as e:
+            print(e)
+
+    async def get_books(self, target_page: int = None) -> AsyncGenerator[str, None]:
         """Fetch books from the website"""
-        for page in range(1, 2000):
+
+        page_range = (
+            range(1, self.max_page + 1)
+            if not target_page
+            else range(target_page, target_page + 1)
+        )
+
+        for page in page_range:
             print(f"Fetching page {page}")
             resp = await self._send_request(
                 f"{self.origin}/index.php/category/page/{page}"

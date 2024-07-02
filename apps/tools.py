@@ -47,16 +47,19 @@ def combine_images(images):
 
 
 def create_pdf(img):
+    # Calculate dimensions and scaling
     img_width, img_height = img.size
     pdf_width, pdf_height = A4
     scale = pdf_width / img_width
     scaled_height = int(img_height * scale)
     pages = (scaled_height + int(pdf_height) - 1) // int(pdf_height)
 
+    # Create PDF
     buffer = BytesIO()
     pdf_canvas = canvas.Canvas(buffer, pagesize=A4)
 
     for page in range(pages):
+        # Calculate crop box for each page
         top = int(page * pdf_height / scale)
         bottom = int((page + 1) * pdf_height / scale)
         bottom = min(bottom, img_height)
@@ -65,8 +68,10 @@ def create_pdf(img):
             logger.error(f"Invalid crop box coordinates: top={top}, bottom={bottom}")
             continue
 
+        # Crop and resize image for the current page
         crop_box = (0, top, img_width, bottom)
         cropped_img = img.crop(crop_box)
+
         new_width = int(pdf_width)
         new_height = int(cropped_img.height * scale)
 
@@ -79,6 +84,8 @@ def create_pdf(img):
             continue
 
         cropped_img = cropped_img.resize((new_width, new_height))
+
+        # Save cropped image to buffer and draw on PDF
         img_buffer = BytesIO()
         cropped_img.save(img_buffer, format="PNG")
         img_buffer.seek(0)
@@ -91,8 +98,13 @@ def create_pdf(img):
             height=cropped_img.height,
         )
 
+        pdf_canvas.showPage()
+
     pdf_canvas.save()
+
+    # Save PDF to model
     buffer.seek(0)
+
     return buffer
 
 

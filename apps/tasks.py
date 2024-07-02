@@ -89,7 +89,7 @@ def find_episodes(book_id: str, start_index: int | None = None):
         loop.run_until_complete(process_episodes(book_id))
 
 
-async def process_images(episode_id: str):
+async def process_images(episode_id: str, force: bool = False):
     episode = await sync_to_async(Episode.objects.get)(pk=episode_id)
     images_task = []
     async for data in ImageExtractor().get_images(episode.raw_url):
@@ -98,7 +98,7 @@ async def process_images(episode_id: str):
             episode=episode,
             defaults=data,
         )
-        if created:
+        if created or force:
             images_task.append([image.id, image.raw_url])
             logger.info(f"Find image: {episode.title} - {image.index}")
 
@@ -112,13 +112,13 @@ async def process_images(episode_id: str):
 
 
 @shared_task
-def find_images(episode_id: str):
+def find_images(episode_id: str, force: bool = False):
     """
     Find images for a specific episode and create or update Image objects
     Usage: from apps.models import Episode;from apps.tasks import find_images as t;t( Episode.objects.first().id );
     """
     with async_event_loop() as loop:
-        loop.run_until_complete(process_images(episode_id))
+        loop.run_until_complete(process_images(episode_id, force=force))
 
 
 @shared_task
