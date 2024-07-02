@@ -26,6 +26,10 @@ jobs:
           source venv/bin/activate
           pip install -r requirements.txt
 
+      - name: Network Test
+        run: |
+          curl -vvv http://se8.us
+
       - name: Run random book fetch script
         run: |
           source venv/bin/activate

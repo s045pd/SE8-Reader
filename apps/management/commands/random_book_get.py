@@ -34,12 +34,13 @@ class Command(BaseCommand):
         return items
 
     async def handle_async(self):
+
         book_dir = Path("books")
         book_dir.mkdir(exist_ok=True)
 
         worker = ImageExtractor()
         book = choice(await self.collect_async_generator(worker.get_books()))
-        logger.info(f"Getting book: {book['title']}")
+        print(f"Getting book: {book['title']}")
 
         async for episode in worker.get_episodes(book["raw_url"]):
             try:
