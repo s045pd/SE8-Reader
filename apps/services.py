@@ -1,8 +1,10 @@
 import asyncio
 from typing import AsyncGenerator, List
 
-from aiocfscrape import CloudflareScraper
-from requests_html import HTML
+from fake_useragent import UserAgent
+from requests_html import HTML, HTMLSession
+
+from apps.tools import curl
 
 
 class ImageExtractor:
@@ -19,18 +21,32 @@ class ImageExtractor:
         if not hasattr(self, "_initialized"):
             self._initialized = True
             self.origin = "https://se8.us"
-            self.cli = CloudflareScraper()
-
-    async def _send_request(self, url: str) -> object:
-        """Send a GET request to the given URL"""
-
-        resp = await (
-            await asyncio.to_thread(
-                self.cli.get,
-                url.strip(),
+            self.cli = HTMLSession()
+            self.cli.headers.update(
+                {
+                    "User-Agent": UserAgent(os=["windows"], platforms="pc").chrome,
+                    "Accept-Language": "en-GB,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
+                    "Cache-Control": "max-age=0",
+                    "Dnt": "1",
+                    "Priority": "u=0, i",
+                }
             )
+
+    async def _send_request(self, url: str, use_curl: bool = True) -> object:
+        """Send a GET request to the given URL"""
+        url = url.strip()
+
+        if use_curl:
+            resp = await asyncio.to_thread(curl, url)
+            return HTML(html=resp)
+
+        return await asyncio.to_thread(
+            self.cli.get,
+            {
+                "url": url,
+                "headers": {"referer": "https://se8.us/"},
+            },
         )
-        return HTML(html=await resp.text())
 
     async def get_books(self) -> AsyncGenerator[str, None]:
         """Fetch books from the website"""
@@ -90,7 +106,7 @@ class ImageExtractor:
 
     async def download_image(self, url: str, key: str = None) -> str:
         """Download and encode image from the given URL"""
-        resp = await self._send_request(url)
+        resp = await self._send_request(url, use_curl=False)
         if not resp.ok:
             return ""
         if not resp.headers.get("Content-Type", "").startswith("image"):

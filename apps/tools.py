@@ -2,6 +2,7 @@ import asyncio
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from io import BytesIO
 from logging import getLogger
+from subprocess import DEVNULL, PIPE, Popen
 
 from PIL import Image as PILImage
 from reportlab.lib.pagesizes import A4
@@ -113,3 +114,35 @@ async def long_image_to_pdf(img, use_process_pool=False):
     else:
         with ThreadPoolExecutor() as executor:
             return await loop.run_in_executor(executor, create_pdf, img)
+
+
+def run_cmd(code, sync: bool = True, shell=True) -> None | str | bytes:
+    p = Popen(
+        code,
+        shell=shell,
+        **(
+            {"stdout": PIPE, "stderr": PIPE}
+            if sync
+            else {
+                "stdin": None,
+                "stdout": DEVNULL,
+                "stderr": DEVNULL,
+                "close_fds": True,
+            }
+        ),
+    )
+    logger.debug(f"[PID:{p.pid} Sync:{sync}]\t{code}")
+    if not sync:
+        return
+    stdout, stderr = list(map(bytes.decode, p.communicate()))
+    if stderr:
+        logger.error(stderr)
+    logger.debug(stdout)
+    return stdout
+
+
+def curl(url: str) -> None:
+    return run_cmd(
+        code=f'curl -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0" -H "Accept-Language: en-GB,en;q=0.9,zh-CN;q=0.8,zh;q=0.7" -H "Cache-Control: max-age=0" -H "Dnt: 1" -H "Priority: u=0, i" {url}',
+        sync=True,
+    )
