@@ -4,3 +4,7 @@ vol
 *.pyo
 *.DS_Store
 Dockerfile_*
+*.zip
+*.pdf
+books
+books/*

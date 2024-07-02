@@ -2,7 +2,13 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from apps.models import Book, Episode, Image, Tag
-from apps.tasks import convert_to_pdf, download_image, find_episodes
+from apps.tasks import (
+    convert_to_pdf,
+    download_image,
+    download_images,
+    find_episodes,
+    find_images,
+)
 
 
 @admin.register(Tag)
@@ -126,18 +132,18 @@ class EpisodeAdmin(admin.ModelAdmin):
 
     def get_images(self, request, queryset):
         """Download images for selected episodes"""
-        for episode in queryset:
-            for image in episode.images.all():
-                download_image.apply_async(args=[image.id])
+        download_images.apply_async(
+            args=[list(queryset.only("id").values_list("id", flat=True))]
+        )
 
-    get_images.short_description = "Get Images"
+    get_images.short_description = "Download Images (Force)"
 
     def refresh_images(self, request, queryset):
         """Refresh images for selected episodes"""
         for episode in queryset:
-            find_episodes.apply_async(args=[episode.id])
+            find_images.apply_async(args=[episode.id])
 
-    refresh_images.short_description = "Refresh Images"
+    refresh_images.short_description = "Find & Download Images"
 
 
 @admin.register(Image)
@@ -146,7 +152,7 @@ class ImageAdmin(admin.ModelAdmin):
     search_fields = ("episode__title", "id")
     list_filter = ("episode__book",)
     readonly_fields = ("episode", "index", "id", "raw_url", "image")
-    actions = ["refresh_image"]
+    actions = ["get_images"]
 
     def get_image_display(self, obj):
         """Display the image in the admin panel"""
@@ -173,9 +179,10 @@ class ImageAdmin(admin.ModelAdmin):
         queryset = queryset.select_related("episode")
         return queryset
 
-    def refresh_image(self, request, queryset):
-        """Refresh image for selected images"""
-        for image in queryset:
-            download_image.apply_async(args=[image.id])
+    def get_images(self, request, queryset):
+        """Download images for selected episodes"""
+        download_images.apply_async(
+            args=[list(queryset.only("id").values_list("id", flat=True))]
+        )
 
-    refresh_image.short_description = "Refresh Image"
+    get_images.short_description = "Download Images (Force)"

@@ -17,7 +17,7 @@ click-repl==0.3.0
 colorlog==6.7.0
 cron_descriptor==1.4.0
 cssselect==1.2.0
-Django==4.2.11
+Django==4.2.5
 django-celery-beat==2.5.0
 django-celery-results==2.5.1
 django-db-geventpool==4.0.5
@@ -44,7 +44,8 @@ packaging==23.1
 parse==1.20.1
 pillow==10.3.0
 prompt-toolkit==3.0.39
-psycopg2-binary==2.9.3
+psycopg2-binary==2.9.5
+pycryptodomex==3.20.0
 pyee==11.1.0
 PyMySQL==1.1.0
 pyppeteer==2.0.0
@@ -54,6 +55,7 @@ python-dateutil==2.8.2
 python-dotenv==1.0.1
 pytz==2023.3.post1
 PyYAML==6.0.1
+pyzipper==0.3.6
 redis==4.6.0
 reportlab==4.2.2
 requests==2.32.3

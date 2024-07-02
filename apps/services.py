@@ -1,5 +1,6 @@
+import asyncio
 from base64 import b64encode
-from typing import Generator
+from typing import AsyncGenerator, Generator, List
 
 import requests_html
 from fake_useragent import UserAgent
@@ -29,18 +30,22 @@ class ImageExtractor:
             }
             self.last_url = ""
 
-    def _send_request(self, url: str) -> requests_html.HTMLResponse:
+    async def _send_request(self, url: str) -> requests_html.HTMLResponse:
         """Send a GET request to the given URL"""
-        resp = self.cli.get(
-            url.strip(), headers=self.cli.headers | {"Referer": self.last_url}
+        resp = await asyncio.to_thread(
+            self.cli.get,
+            url.strip(),
+            headers=self.cli.headers | {"Referer": self.last_url},
         )
         self.last_url = resp.url
         return resp
 
-    def get_books(self) -> Generator[str, None, None]:
+    async def get_books(self) -> AsyncGenerator[str, None]:
         """Fetch books from the website"""
         for page in range(1, 2000):
-            resp = self._send_request(f"{self.origin}/index.php/category/page/{page}")
+            resp = await self._send_request(
+                f"{self.origin}/index.php/category/page/{page}"
+            )
             if not (books := resp.html.xpath("//div[@class='common-comic-item']")):
                 break
 
@@ -53,9 +58,9 @@ class ImageExtractor:
                     "current": book.xpath("//p[@class='comic-update']/a/text()")[0],
                 }
 
-    def get_episodes(self, url: str) -> Generator[str, None, None]:
+    async def get_episodes(self, url: str) -> AsyncGenerator[str, None]:
         """Fetch episodes for a specific book"""
-        resp = self._send_request(url)
+        resp = await self._send_request(url)
         if not (
             episodes := resp.html.xpath("//ul[@class='chapter__list-box clearfix']//li")
         ):
@@ -78,9 +83,9 @@ class ImageExtractor:
                 "title": episode.text,
             }
 
-    def get_images(self, url: str) -> Generator[str, None, None]:
+    async def get_images(self, url: str) -> AsyncGenerator:
         """Fetch images for a specific episode"""
-        resp = self._send_request(url)
+        resp = await self._send_request(url)
         if not (images := resp.html.xpath("//div[@class='rd-article__pic hide']")):
             return
 
@@ -91,11 +96,23 @@ class ImageExtractor:
                 "raw_url": image_div.xpath("//img/@data-original")[0],
             }
 
-    def download_image(self, url: str) -> str:
+    async def download_image(self, url: str, key: str = None) -> str:
         """Download and encode image from the given URL"""
-        resp = self._send_request(url)
+        resp = await self._send_request(url)
         if not resp.ok:
             return ""
         if not resp.headers.get("Content-Type", "").startswith("image"):
             return ""
-        return b64encode(resp.content).decode()
+        if key:
+            return [key, resp.content]
+        return resp.content
+
+    async def get_images_concurrently(self, urls: List[str]) -> List[str]:
+        """Fetch images concurrently"""
+        tasks = [self.download_image(url) for url in urls]
+        return await asyncio.gather(*tasks)
+
+    async def get_images_concurrently_with_id(self, items: dict) -> List[str]:
+        """Fetch images concurrently"""
+        tasks = [self.download_image(url=url, key=key) for (key, url) in items]
+        return await asyncio.gather(*tasks)

@@ -28,6 +28,17 @@
             "program": "${workspaceFolder}/manage.py"
         },
         {
+            "name": "Random Book",
+            "type": "debugpy",
+            "request": "launch",
+            "args": [
+                "random_book_get"
+            ],
+            "django": true,
+            "autoStartBrowser": false,
+            "program": "${workspaceFolder}/manage.py"
+        },
+        {
             "name": "CeleryBeats",
             "type": "debugpy",
             "request": "launch",

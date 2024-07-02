@@ -1,5 +1,7 @@
+import asyncio
 import logging
 
+from asgiref.sync import sync_to_async
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.decorators import method_decorator
@@ -22,7 +24,7 @@ class TriggerFindBooksView(View):
 def serve_pdf(request, episode_id):
     try:
         episode = get_object_or_404(Episode, pk=episode_id)
-        buffer = episode.convert_to_pdf(read=True)
+        buffer = asyncio.run(episode.convert_to_pdf(read=True))
         response = HttpResponse(buffer, content_type="application/pdf")
         response["Content-Disposition"] = f'attachment; filename="{episode.title}.pdf"'
         return response
