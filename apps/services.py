@@ -38,6 +38,7 @@ class ImageExtractor:
             headers=self.cli.headers | {"Referer": self.last_url},
         )
         self.last_url = resp.url
+        print(f"GET {resp.url} - {resp.status_code}")
         return resp
 
     async def get_books(self) -> AsyncGenerator[str, None]:

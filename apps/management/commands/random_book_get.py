@@ -39,7 +39,14 @@ class Command(BaseCommand):
         book_dir.mkdir(exist_ok=True)
 
         worker = ImageExtractor()
-        book = choice(await self.collect_async_generator(worker.get_books()))
+
+        resp = await worker._send_request("/index.php/category/page/1")
+        print(f"GET {resp.url} - {resp.status_code} - {resp.text}")
+
+        books = await self.collect_async_generator(worker.get_books())
+        print(f"Got {len(books)} books")
+
+        book = choice(books)
         print(f"Getting book: {book['title']}")
 
         async for episode in worker.get_episodes(book["raw_url"]):
