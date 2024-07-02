@@ -40,7 +40,7 @@ class Command(BaseCommand):
 
         worker = ImageExtractor()
 
-        resp = await worker._send_request("/index.php/category/page/1")
+        resp = await worker._send_request("https://se8.us/index.php/category/page/1")
         print(f"GET {resp.url} - {resp.status_code} - {resp.text}")
 
         books = await self.collect_async_generator(worker.get_books())
