@@ -40,11 +40,13 @@ class Command(BaseCommand):
         resp = await worker._send_request("https://se8.us/index.php/category/page/1")
         print(f"GET {resp.url} - {resp.text}")
 
-        books = await self.collect_async_generator(worker.get_books())
+        if not (books := await self.collect_async_generator(worker.get_books())):
+            print("No books found")
+            return
+
         print(f"Got {len(books)} books")
 
-        book = choice(books)
-        (book_dir / "name").write_text(book["title"])
+        (book_dir / "name").write_text((book := choice(books))["title"])
 
         print(f"Getting book: {book['title']}")
 

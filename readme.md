@@ -10,9 +10,9 @@ This project is an adult comic downloader that promises to provide access to a w
 Ensure that you have Docker and Docker Compose installed and Docker is running.
 
 ```bash
-git clone <repository-url>
-cd <project-directory>
-bash docker_compose_rebuild.sh
+git clone https://github.com/s045pd/SE8-Reader.git
+cd SE8-Reader
+docker-compose -f docker-compose-quick.yml up
 ```
 After a short wait, open your browser and visit ***http://127.0.0.1:8000***. 
 
