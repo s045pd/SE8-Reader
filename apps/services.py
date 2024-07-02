@@ -22,7 +22,7 @@ class ImageExtractor:
             self.origin = "https://se8.us"
             self.cli = requests_html.HTMLSession()
             self.cli.headers = {
-                "User-Agent": UserAgent(os=["windows"], platforms="pc").chrome,
+                "User-Agent": UserAgent(os=["windows"], platforms="pc").firefox,
                 "Accept-Language": "en-GB,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
                 "Cache-Control": "max-age=0",
                 "Dnt": "1",
