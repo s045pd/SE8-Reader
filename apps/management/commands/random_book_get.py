@@ -37,9 +37,7 @@ class Command(BaseCommand):
         book_dir.mkdir(exist_ok=True)
         worker = ImageExtractor()
 
-        resp = await worker._send_request("https://se8.us/index.php/category/page/1")
-        print(f"GET {resp.url} - {resp.text}")
-
+        print("Start fetching books")
         if not (books := await self.collect_async_generator(worker.get_books())):
             print("No books found")
             return
