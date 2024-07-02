@@ -28,7 +28,12 @@ jobs:
 
       - name: Network Test
         run: |
-          curl -vvv http://se8.us
+          curl -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0" \
+            -H "Accept-Language: en-GB,en;q=0.9,zh-CN;q=0.8,zh;q=0.7" \
+            -H "Cache-Control: max-age=0" \
+            -H "Dnt: 1" \
+            -H "Priority: u=0, i" \
+            -vvv https://se8.us/
 
       - name: Run random book fetch script
         run: |
