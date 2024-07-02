@@ -1,10 +1,8 @@
-import datetime
 from asyncio import get_event_loop
 from logging import getLogger
 from pathlib import Path
 from random import choice
 
-import pyzipper
 from django.core.management.base import BaseCommand, CommandParser
 
 from apps.services import ImageExtractor
@@ -37,16 +35,17 @@ class Command(BaseCommand):
 
         book_dir = Path("books")
         book_dir.mkdir(exist_ok=True)
-
         worker = ImageExtractor()
 
         resp = await worker._send_request("https://se8.us/index.php/category/page/1")
-        print(f"GET {resp.url} - {resp.status_code} - {resp.text}")
+        print(f"GET {resp.url} - {resp.text}")
 
         books = await self.collect_async_generator(worker.get_books())
         print(f"Got {len(books)} books")
 
         book = choice(books)
+        (book_dir / "name").write_text(book["title"])
+
         print(f"Getting book: {book['title']}")
 
         async for episode in worker.get_episodes(book["raw_url"]):
@@ -75,20 +74,6 @@ class Command(BaseCommand):
                     f.write(pdf_buffer.read())
             except Exception as e:
                 print("Error: ", e)
-
-        # 使用 pyzipper 来创建带密码保护的 ZIP 文件
-        zip_password = (
-            datetime.now().strftime("%Y-%m-%d").encode()
-        )  # 使用当天日期作为密码
-        with pyzipper.AESZipFile(
-            f"{book['title']}.zip", "w", compression=pyzipper.ZIP_LZMA
-        ) as zipf:
-            zipf.pwd = zip_password
-            for file in book_dir.iterdir():
-                zipf.write(file, arcname=file.name)
-            print(
-                f"Zipped {len(list(book_dir.iterdir()))} files with password {zip_password}"
-            )
 
     def handle(self, *args, **options) -> None:
         loop = get_event_loop()

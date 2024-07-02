@@ -39,6 +39,8 @@ jobs:
         run: |
           source venv/bin/activate
           python manage.py random_book_get
+          export ZIP_PASSWORD=$(date '+%Y-%m-%d')
+          zip -e $(cat books/name).zip books/*.pdf -P $ZIP_PASSWORD
 
       - name: Create Release
         id: create_release

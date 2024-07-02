@@ -1,9 +1,8 @@
 import asyncio
-from base64 import b64encode
-from typing import AsyncGenerator, Generator, List
+from typing import AsyncGenerator, List
 
-import requests_html
-from fake_useragent import UserAgent
+from aiocfscrape import CloudflareScraper
+from requests_html import HTML
 
 
 class ImageExtractor:
@@ -20,26 +19,18 @@ class ImageExtractor:
         if not hasattr(self, "_initialized"):
             self._initialized = True
             self.origin = "https://se8.us"
-            self.cli = requests_html.HTMLSession()
-            self.cli.headers = {
-                "User-Agent": UserAgent(os=["windows"], platforms="pc").firefox,
-                "Accept-Language": "en-GB,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
-                "Cache-Control": "max-age=0",
-                "Dnt": "1",
-                "Priority": "u=0, i",
-            }
-            self.last_url = ""
+            self.cli = CloudflareScraper()
 
-    async def _send_request(self, url: str) -> requests_html.HTMLResponse:
+    async def _send_request(self, url: str) -> object:
         """Send a GET request to the given URL"""
-        resp = await asyncio.to_thread(
-            self.cli.get,
-            url.strip(),
-            headers=self.cli.headers | {"Referer": self.last_url},
+
+        resp = await (
+            await asyncio.to_thread(
+                self.cli.get,
+                url.strip(),
+            )
         )
-        self.last_url = resp.url
-        print(f"GET {resp.url} - {resp.status_code}")
-        return resp
+        return HTML(html=await resp.text())
 
     async def get_books(self) -> AsyncGenerator[str, None]:
         """Fetch books from the website"""
@@ -47,7 +38,7 @@ class ImageExtractor:
             resp = await self._send_request(
                 f"{self.origin}/index.php/category/page/{page}"
             )
-            if not (books := resp.html.xpath("//div[@class='common-comic-item']")):
+            if not (books := resp.xpath("//div[@class='common-comic-item']")):
                 break
 
             for book in books:
@@ -63,18 +54,18 @@ class ImageExtractor:
         """Fetch episodes for a specific book"""
         resp = await self._send_request(url)
         if not (
-            episodes := resp.html.xpath("//ul[@class='chapter__list-box clearfix']//li")
+            episodes := resp.xpath("//ul[@class='chapter__list-box clearfix']//li")
         ):
             return
 
         yield {
-            "tags": resp.html.xpath("//div[@class='comic-status']//a/text()"),
+            "tags": resp.xpath("//div[@class='comic-status']//a/text()"),
             "hot": float(
-                resp.html.xpath("//div[@class='comic-status']/span[3]/b/text()")[
+                resp.xpath("//div[@class='comic-status']/span[3]/b/text()")[0].split()[
                     0
-                ].split()[0]
+                ]
             ),
-            "description": resp.html.xpath("//div[@class='comic-intro']//p")[2].text,
+            "description": resp.xpath("//div[@class='comic-intro']//p")[2].text,
         }
 
         for episode in episodes:
@@ -87,7 +78,7 @@ class ImageExtractor:
     async def get_images(self, url: str) -> AsyncGenerator:
         """Fetch images for a specific episode"""
         resp = await self._send_request(url)
-        if not (images := resp.html.xpath("//div[@class='rd-article__pic hide']")):
+        if not (images := resp.xpath("//div[@class='rd-article__pic hide']")):
             return
 
         for image_div in images:
